@@ -6,8 +6,11 @@ use crate::handlers;
 
 pub fn config_from_env(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/api")
-            .service(handlers::ping::ping)
+        web::scope("/api").service(handlers::ping::ping).service(
+            web::scope("/auth")
+                .service(handlers::user_handlers::auth::signup)
+                .service(handlers::user_handlers::auth::login),
+        ),
     );
 }
 
