@@ -3,9 +3,12 @@ use crate::{
     errors::{ErrorKind, ServiceError},
     schema::users::{self, dsl::*},
 };
+use actix_web::{error::ErrorUnauthorized, Error, FromRequest};
 use diesel::prelude::*;
 use diesel_derive_enum::DbEnum;
-use jsonwebtoken::{Algorithm, EncodingKey, Header};
+use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use std::future::Future;
+use std::pin::Pin;
 
 #[derive(Clone, Debug, DbEnum, Serialize, Deserialize)]
 #[DieselType = "User_role_t"]
@@ -35,6 +38,60 @@ struct Claims {
     exp: usize,
     name: String,
     role: UserRole,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct UserInfo {
+    pub id: uuid::Uuid,
+    pub username: String,
+    pub user_role: UserRole,
+}
+
+impl From<Claims> for UserInfo {
+    fn from(u: Claims) -> Self {
+        Self {
+            username: u.name,
+            id: uuid::Uuid::parse_str(&u.sub).unwrap(),
+            user_role: u.role,
+        }
+    }
+}
+
+impl From<User> for UserInfo {
+    fn from(u: User) -> Self {
+        Self {
+            username: u.username,
+            id: u.id,
+            user_role: u.user_role,
+        }
+    }
+}
+
+#[derive(Deserialize, Serialize, Clone)]
+pub struct AuthorisedUser(pub UserInfo);
+
+impl FromRequest for AuthorisedUser {
+    type Error = Error;
+
+    type Future = Pin<Box<dyn Future<Output = Result<AuthorisedUser, Error>>>>;
+
+    fn from_request(req: &actix_web::HttpRequest, _: &mut actix_web::dev::Payload) -> Self::Future {
+        let jwt = req.headers().get("Authorization").cloned();
+        if let Some(jwt) = jwt {
+            Box::pin(async move {
+                jsonwebtoken::decode::<Claims>(
+                    jwt.to_str().unwrap(),
+                    &DecodingKey::from_secret(b"secret"),
+                    &Validation::new(Algorithm::HS512),
+                )
+                .map(|cl| cl.claims.into())
+                .map(|u| AuthorisedUser(u))
+                .map_err(|_| ErrorUnauthorized("Invalid token"))
+            })
+        } else {
+            Box::pin(async { Err(ErrorUnauthorized("Invalid auth type")) })
+        }
+    }
 }
 
 type Token = String;
