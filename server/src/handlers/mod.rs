@@ -1,5 +1,5 @@
-pub mod user_handlers;
 pub mod task_handlers;
+pub mod user_handlers;
 
 pub mod ping {
     use actix_web::{get, HttpResponse};

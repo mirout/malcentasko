@@ -1,4 +1,8 @@
-use crate::{schema::tasks::{self, dsl::*}, errors::ServiceError, config::Connection};
+use crate::{
+    config::Connection,
+    errors::ServiceError,
+    schema::tasks::{self, dsl::*},
+};
 use diesel::prelude::*;
 
 #[derive(Debug, Identifiable, Queryable, Serialize, Deserialize)]
@@ -30,7 +34,7 @@ impl TaskInfo {
     pub fn with_owner_id(task: TaskDescription, user_id: uuid::Uuid) -> Self {
         Self {
             owner_id: user_id,
-            title: task.title, 
+            title: task.title,
             task_description: task.task_description,
             parent_id: task.parent_id,
         }
@@ -39,6 +43,9 @@ impl TaskInfo {
 
 impl Task {
     pub fn create_new_task(task: &TaskInfo, conn: &Connection) -> Result<uuid::Uuid, ServiceError> {
-        Ok(diesel::insert_into(tasks).values(task).returning(id).get_result(conn)?)
+        Ok(diesel::insert_into(tasks)
+            .values(task)
+            .returning(id)
+            .get_result(conn)?)
     }
 }

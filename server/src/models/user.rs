@@ -87,7 +87,10 @@ impl FromRequest for AuthorisedUser {
                 )
                 .map(|cl| cl.claims.into())
                 .map(|u| AuthorisedUser(u))
-                .map_err(|err| {println!("{:?}",err); ErrorUnauthorized("Invalid token")})
+                .map_err(|err| {
+                    println!("{:?}", err);
+                    ErrorUnauthorized("Invalid token")
+                })
             })
         } else {
             Box::pin(async { Err(ErrorUnauthorized("Invalid auth type")) })
