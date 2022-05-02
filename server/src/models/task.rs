@@ -3,7 +3,8 @@ use crate::{
     errors::ServiceError,
     schema::tasks::{self, dsl::*},
 };
-use diesel::prelude::*;
+use actix_web::dev::Service;
+use diesel::{prelude::*};
 
 #[derive(Debug, Identifiable, Queryable, Serialize, Deserialize)]
 pub struct Task {
@@ -47,5 +48,13 @@ impl Task {
             .values(task)
             .returning(id)
             .get_result(conn)?)
+    }
+
+    pub fn get_users_tasks(user_id: uuid::Uuid, conn: &Connection) -> Result<Vec<Task>, ServiceError> {
+        Ok(tasks.filter(owner_id.eq(user_id)).load::<Task>(conn)?)
+    }
+
+    pub fn get_children_tasks(user_id: uuid::Uuid, parent: uuid::Uuid, conn: &Connection) -> Result<Vec<Task>, ServiceError> {
+        Ok(tasks.filter(owner_id.eq(user_id)).filter(parent_id.eq(parent)).load::<Task>(conn)?)
     }
 }

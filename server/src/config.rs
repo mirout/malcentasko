@@ -13,7 +13,11 @@ pub fn config_from_env(cfg: &mut web::ServiceConfig) {
                     .service(handlers::user_handlers::auth::signup)
                     .service(handlers::user_handlers::auth::login),
             )
-            .service(web::scope("/tasks").service(handlers::task_handlers::create_new_task)),
+            .service(
+                web::scope("/tasks")
+                    .service(handlers::task_handlers::create_new_task)
+                    .service(handlers::task_handlers::get_users_tasks),
+            ),
     );
 }
 
