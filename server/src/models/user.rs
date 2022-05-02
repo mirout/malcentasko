@@ -79,14 +79,15 @@ impl FromRequest for AuthorisedUser {
         let jwt = req.headers().get("Authorization").cloned();
         if let Some(jwt) = jwt {
             Box::pin(async move {
+                let jwt: Vec<_> = jwt.to_str().unwrap().split_ascii_whitespace().collect();
                 jsonwebtoken::decode::<Claims>(
-                    jwt.to_str().unwrap(),
+                    jwt[1],
                     &DecodingKey::from_secret(b"secret"),
                     &Validation::new(Algorithm::HS512),
                 )
                 .map(|cl| cl.claims.into())
                 .map(|u| AuthorisedUser(u))
-                .map_err(|_| ErrorUnauthorized("Invalid token"))
+                .map_err(|err| {println!("{:?}",err); ErrorUnauthorized("Invalid token")})
             })
         } else {
             Box::pin(async { Err(ErrorUnauthorized("Invalid auth type")) })

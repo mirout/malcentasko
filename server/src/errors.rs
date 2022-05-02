@@ -9,6 +9,7 @@ pub enum ErrorKind {
     DBError,
     InternalError,
     NotFound,
+    NotAllowed,
 }
 
 #[derive(Debug)]
@@ -38,6 +39,14 @@ impl ServiceError {
         Self {
             kind: ErrorKind::Forbidden,
             msg,
+            source: None,
+        }
+    }
+
+    pub fn not_allowed() -> Self {
+        Self {
+            kind: ErrorKind::NotAllowed,
+            msg: "".to_string(),
             source: None,
         }
     }
@@ -81,6 +90,7 @@ impl Into<HttpResponse> for ServiceError {
             ErrorKind::Forbidden => HttpResponse::Forbidden(),
             ErrorKind::InternalError | ErrorKind::DBError => HttpResponse::InternalServerError(),
             ErrorKind::NotFound => HttpResponse::NotFound(),
+            ErrorKind::NotAllowed => HttpResponse::MethodNotAllowed(),
         }
         .body(self.msg)
     }

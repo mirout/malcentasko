@@ -2,20 +2,11 @@ use actix_web::{error::BlockingError, HttpResponse};
 
 use crate::errors::ServiceError;
 
-fn unpack_result<T>(
-    result: Result<Result<T, ServiceError>, BlockingError>,
-) -> Result<T, HttpResponse> {
-    result
-        .map_err(|_| HttpResponse::InternalServerError().finish())
-        .and_then(|x| x.map_err(|e| e.into()))
-        .map(|u| u.into())
-}
-
 pub mod auth {
     use actix_web::{post, web, HttpResponse, Responder};
 
     use crate::{
-        config::Pool, handlers::user_handlers::unpack_result, models::user::UserCredentials,
+        config::Pool, handlers::utils::unpack_result, models::user::UserCredentials,
         services::user_service,
     };
 
