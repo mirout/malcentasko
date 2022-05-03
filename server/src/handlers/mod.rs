@@ -11,7 +11,7 @@ pub mod ping {
 }
 
 mod utils {
-    use actix_web::{error::BlockingError, HttpResponse};
+    use actix_web::{error::BlockingError, HttpResponse, Responder};
 
     use crate::errors::ServiceError;
 
