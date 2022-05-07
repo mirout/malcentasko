@@ -8,6 +8,9 @@ table! {
         parent_id -> Nullable<Uuid>,
         title -> Varchar,
         task_description -> Text,
+        created_at -> Timestamptz,
+        done_at -> Nullable<Timestamptz>,
+        is_done -> Bool,
     }
 }
 
@@ -25,4 +28,7 @@ table! {
 
 joinable!(tasks -> users (owner_id));
 
-allow_tables_to_appear_in_same_query!(tasks, users,);
+allow_tables_to_appear_in_same_query!(
+    tasks,
+    users,
+);

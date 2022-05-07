@@ -3,7 +3,7 @@ use crate::{
     errors::ServiceError,
     schema::tasks::{self, dsl::*},
 };
-use actix_web::dev::Service;
+use chrono::{DateTime, Utc};
 use diesel::{prelude::*};
 
 #[derive(Debug, Identifiable, Queryable, Serialize, Deserialize)]
@@ -13,6 +13,10 @@ pub struct Task {
     pub parent_id: Option<uuid::Uuid>,
     pub title: String,
     pub task_description: String,
+    pub created_at: DateTime<Utc>,
+    pub done_at: Option<DateTime<Utc>>,
+    pub is_done: bool,
+
 }
 
 #[derive(Debug, Serialize, Deserialize)]

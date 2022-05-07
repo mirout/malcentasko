@@ -1,7 +1,3 @@
-use actix_web::{error::BlockingError, HttpResponse};
-
-use crate::errors::ServiceError;
-
 pub mod auth {
     use actix_web::{post, web, HttpResponse, Responder};
 
