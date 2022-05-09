@@ -16,7 +16,8 @@ pub fn config_from_env(cfg: &mut web::ServiceConfig) {
             .service(
                 web::scope("/tasks")
                     .service(handlers::task_handlers::create_new_task)
-                    .service(handlers::task_handlers::get_users_tasks),
+                    .service(handlers::task_handlers::get_users_tasks)
+                    .service(handlers::task_handlers::update_task_status),
             ),
     );
 }
