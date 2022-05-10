@@ -4,7 +4,7 @@ use crate::{
     schema::tasks::{self, dsl::*},
 };
 use chrono::{DateTime, Utc};
-use diesel::{prelude::*};
+use diesel::prelude::*;
 
 #[derive(Debug, Identifiable, Queryable, Serialize, Deserialize)]
 pub struct Task {
@@ -16,7 +16,6 @@ pub struct Task {
     pub created_at: DateTime<Utc>,
     pub done_at: Option<DateTime<Utc>>,
     pub is_done: bool,
-
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -54,23 +53,43 @@ impl Task {
             .get_result(conn)?)
     }
 
-    pub fn get_users_tasks(user_id: uuid::Uuid, conn: &Connection) -> Result<Vec<Task>, ServiceError> {
+    pub fn get_users_tasks(
+        user_id: uuid::Uuid,
+        conn: &Connection,
+    ) -> Result<Vec<Task>, ServiceError> {
         Ok(tasks.filter(owner_id.eq(user_id)).load::<Task>(conn)?)
     }
 
-    pub fn get_children_tasks(user_id: uuid::Uuid, parent: uuid::Uuid, conn: &Connection) -> Result<Vec<Task>, ServiceError> {
-        Ok(tasks.filter(owner_id.eq(user_id)).filter(parent_id.eq(parent)).load::<Task>(conn)?)
+    pub fn get_children_tasks(
+        user_id: uuid::Uuid,
+        parent: uuid::Uuid,
+        conn: &Connection,
+    ) -> Result<Vec<Task>, ServiceError> {
+        Ok(tasks
+            .filter(owner_id.eq(user_id))
+            .filter(parent_id.eq(parent))
+            .load::<Task>(conn)?)
     }
 
     pub fn get_task_by_id(task_id: uuid::Uuid, conn: &Connection) -> Result<Task, ServiceError> {
         Ok(tasks.filter(id.eq(task_id)).get_result(conn)?)
     }
 
-    pub fn set_new_is_done_value(task_id: uuid::Uuid, new_value: bool, conn: &Connection) -> Result<(), ServiceError> {
-        diesel::update(
-            tasks.filter(id.eq(task_id)).filter(is_done.eq(!new_value))
-        ).set((is_done.eq(new_value), if new_value {done_at.eq(Some(chrono::Utc::now()))} else {done_at.eq(None)}))
-        .execute(conn)?;
+    pub fn set_new_is_done_value(
+        task_id: uuid::Uuid,
+        new_value: bool,
+        conn: &Connection,
+    ) -> Result<(), ServiceError> {
+        diesel::update(tasks.filter(id.eq(task_id)).filter(is_done.eq(!new_value)))
+            .set((
+                is_done.eq(new_value),
+                if new_value {
+                    done_at.eq(Some(chrono::Utc::now()))
+                } else {
+                    done_at.eq(None)
+                },
+            ))
+            .execute(conn)?;
 
         Ok(())
     }

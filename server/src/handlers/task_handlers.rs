@@ -1,6 +1,6 @@
 use actix_web::{get, post, web, HttpResponse, Responder};
 use diesel::deserialize;
-use serde::{Deserializer, de, Deserialize};
+use serde::{de, Deserialize, Deserializer};
 
 use crate::{
     config::Pool,
@@ -45,7 +45,8 @@ pub struct UpdateTaskStatus {
 }
 
 fn bool_from_str<'de, D>(deserializer: D) -> Result<bool, D::Error>
-    where D: Deserializer<'de>
+where
+    D: Deserializer<'de>,
 {
     use std::str::FromStr;
     let s = String::deserialize(deserializer)?;

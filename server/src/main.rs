@@ -13,10 +13,10 @@ extern crate serde_json;
 mod config;
 mod errors;
 mod handlers;
+mod macros;
 mod models;
 mod schema;
 mod services;
-mod macros;
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
