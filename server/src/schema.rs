@@ -54,9 +54,4 @@ joinable!(tasks -> task_status_for_user (status_name));
 joinable!(tasks -> task_types_for_user (type_name));
 joinable!(tasks -> users (user_id));
 
-allow_tables_to_appear_in_same_query!(
-    task_status_for_user,
-    task_types_for_user,
-    tasks,
-    users,
-);
+allow_tables_to_appear_in_same_query!(task_status_for_user, task_types_for_user, tasks, users,);

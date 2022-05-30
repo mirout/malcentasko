@@ -2,7 +2,10 @@ use crate::{
     config::Connection,
     errors::ServiceError,
     models::user::User,
-    schema::{tasks::{self, dsl::*}, task_status_for_user, task_types_for_user},
+    schema::{
+        task_status_for_user, task_types_for_user,
+        tasks::{self, dsl::*},
+    },
 };
 use chrono::{DateTime, Utc};
 use diesel::prelude::*;
@@ -71,7 +74,12 @@ pub struct TaskInfo {
 }
 
 impl TaskInfo {
-    pub fn with_owner_id(task: TaskDescription, status: StatusTable, t: TypeTable, owner_id: uuid::Uuid) -> Self {
+    pub fn with_owner_id(
+        task: TaskDescription,
+        status: StatusTable,
+        t: TypeTable,
+        owner_id: uuid::Uuid,
+    ) -> Self {
         Self {
             user_id: owner_id,
             title: task.title,
@@ -102,16 +110,14 @@ impl Task {
         owner_id: uuid::Uuid,
         conn: &Connection,
     ) -> Result<Vec<JoinedTask>, ServiceError> {
-        Ok(
-            tasks
+        Ok(tasks
             .inner_join(task_status_for_user::table)
             .inner_join(task_types_for_user::table)
             .filter(user_id.eq(owner_id))
             .load::<(Task, StatusTable, TypeTable)>(conn)?
             .into_iter()
             .map(|x| x.into())
-            .collect()
-        )
+            .collect())
     }
 
     pub fn get_children_tasks(
@@ -134,7 +140,9 @@ impl Task {
         new_status: StatusTable,
         conn: &Connection,
     ) -> Result<(), ServiceError> {
-        diesel::update(tasks.filter(id.eq(task_id))).set(status_name.eq(new_status.id)).execute(conn)?;
+        diesel::update(tasks.filter(id.eq(task_id)))
+            .set(status_name.eq(new_status.id))
+            .execute(conn)?;
         Ok(())
     }
 }
