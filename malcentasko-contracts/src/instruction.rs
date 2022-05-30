@@ -1,5 +1,0 @@
-pub enum MalcentaskoInsruction {
-    CreateTask {
-        
-    }
-}
