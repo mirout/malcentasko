@@ -10,14 +10,14 @@ use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use std::future::Future;
 use std::pin::Pin;
 
-#[derive(Clone, Debug, DbEnum, Serialize, Deserialize)]
+#[derive(Clone, Debug, DbEnum, Serialize, Deserialize, PartialEq)]
 #[DieselType = "User_role_t"]
 pub enum UserRole {
     Admin,
     User,
 }
 
-#[derive(Identifiable, Queryable, Serialize, Deserialize)]
+#[derive(Identifiable, Queryable, Serialize, Deserialize, PartialEq)]
 pub struct User {
     pub id: uuid::Uuid,
     pub username: String,

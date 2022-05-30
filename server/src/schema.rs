@@ -26,7 +26,7 @@ table! {
 
     tasks (id) {
         id -> Uuid,
-        owner_id -> Uuid,
+        user_id -> Uuid,
         parent_id -> Nullable<Uuid>,
         title -> Varchar,
         task_description -> Text,
@@ -52,7 +52,7 @@ joinable!(task_status_for_user -> users (user_id));
 joinable!(task_types_for_user -> users (user_id));
 joinable!(tasks -> task_status_for_user (status_name));
 joinable!(tasks -> task_types_for_user (type_name));
-joinable!(tasks -> users (owner_id));
+joinable!(tasks -> users (user_id));
 
 allow_tables_to_appear_in_same_query!(
     task_status_for_user,

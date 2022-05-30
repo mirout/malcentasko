@@ -37,11 +37,16 @@ pub struct BooleanValue {
 }
 
 #[derive(Deserialize, Serialize)]
+pub struct StringValue {
+    pub new_value: String,
+}
+
+#[derive(Deserialize, Serialize)]
 pub struct UpdateTaskStatus {
     #[serde(flatten)]
     pub id: TaskId,
     #[serde(flatten)]
-    pub val: BooleanValue,
+    pub val: StringValue,
 }
 
 fn bool_from_str<'de, D>(deserializer: D) -> Result<bool, D::Error>
@@ -64,9 +69,9 @@ pub async fn get_children_tasks(
 
 #[post("/update_task_status")]
 pub async fn update_task_status(
-    _: AuthorisedUser,
+    owner: AuthorisedUser,
     web::Query(UpdateTaskStatus { id, val }): web::Query<UpdateTaskStatus>,
     pool: web::Data<Pool>,
 ) -> impl Responder {
-    blocking_request!(pool, task_service::update_task_status[id.id, val.new_value, &pool])
+    blocking_request!(pool, task_service::update_task_status[owner.0, id.id, val.new_value, &pool])
 }
